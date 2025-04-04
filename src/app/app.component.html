@@ -1,0 +1,129 @@
+<div class="container">
+  <h2 class="text-left text-primary p-3">Dynamic Time Table Generator</h2>
+  <form [formGroup]="newForm" (ngSubmit)="onSubmit()">
+    <div class="p-3">
+      <div class="row">
+        <div class="col-4">
+          <label class="py-1">Working days:</label>
+          <input class="form-control" formControlName="noOfWorkingDays" maxlength="10" appPositiveNumber type="text" />
+
+          @if (newForm.get('noOfWorkingDays')?.touched && newForm.get('noOfWorkingDays')?.hasError('required')) {
+          <span class="text-danger">Please enter working days.</span>
+          }
+          @else if (newForm.get('noOfWorkingDays')?.touched && newForm.get('noOfWorkingDays')?.hasError('min')) {
+          <span class="text-danger">Please enter minimum value is 1</span>
+          }
+          @else if (newForm.get('noOfWorkingDays')?.touched && newForm.get('noOfWorkingDays')?.hasError('max')) {
+          <span class="text-danger">Please enter maximum value is 7</span>
+          }
+        </div>
+
+        <div class="col-4">
+          <label class="py-1">Subjects per day:</label>
+          <input class="form-control" formControlName="noOfSubjectsPerDay" maxlength="10" type="text" />
+          @if (newForm.get('noOfSubjectsPerDay')?.touched && newForm.get('noOfSubjectsPerDay')?.hasError('required')) {
+          <span class="text-danger">Please enter subject per day.</span>
+          }
+          @else if (newForm.get('noOfSubjectsPerDay')?.touched && newForm.get('noOfSubjectsPerDay')?.hasError('min')) {
+          <span class="text-danger">Please enter minimum value is 1</span>
+          }
+          @else if (newForm.get('noOfSubjectsPerDay')?.touched && newForm.get('noOfSubjectsPerDay')?.hasError('max')) {
+          <span class="text-danger">Please enter maximum value is 8</span>
+          }
+        </div>
+
+        <div class="col-4">
+          <label class="py-1">Total Subject:</label>
+          <input class="form-control" formControlName="totalSubject" type="text" maxlength="10" />
+          @if (newForm.get('totalSubject')?.touched && newForm.get('totalSubject')?.hasError('required')) {
+          <span class="text-danger">Please enter total subject.</span>
+          }
+          @else if (newForm.get('totalSubject')?.touched && newForm.get('totalSubject')?.hasError('min')) {
+          <span class="text-danger">Please enter minimum value is 1</span>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="d-flex justify-content-center">
+      <button class="btn btn-primary mx-2" type="submit">
+        Submit
+      </button>
+      <button type="button" class="btn btn-info" (click)="onClear()">Clear</button>
+    </div>
+  </form>
+
+  @if (totalHours) {
+  <div class="mt-5">
+    <table class="table table-bordered">
+      <tr>
+        <th>Working Days</th>
+        <th>Subjects per Day</th>
+        <th>Total Subject</th>
+        <th>Total Hours</th>
+      </tr>
+      <tr>
+        <td>{{ workingDays }}</td>
+        <td>{{ subjectPerDay }}</td>
+        <td>{{ totalSubject }}</td>
+        <td>{{ totalHours }}</td>
+      </tr>
+    </table>
+    <h3 class="text-left my-3">Add subject with hours</h3>
+    <form [formGroup]="subjectForm">
+      <div class="p-2" formArrayName="subject">
+        <div></div>
+        @for (subjectGroup of subject.controls; track subjectGroup) {
+        <div [formGroupName]="$index" class="p-1">
+          
+          <div class="d-flex">
+            <label class="mx-1">{{ $index + 1 }}:</label>
+            <div class="col-6 mx-1">
+              <label class="label">Subject Name</label>
+              <input class="form-control" type="text" appOnlyAlphabets formControlName="subjectName" />
+              @if (newForm.get('subjectName')?.touched && newForm.get('subjectName')?.hasError('required')) {
+              <span class="text-danger">Please enter subject name.</span>
+              }
+            </div>
+            <div class="col-6">
+              <label class="label">Hours</label>
+              <input class="form-control" type="text" appPositiveNumber formControlName="hours" />
+              @if (newForm.get('hours')?.touched && newForm.get('hours')?.hasError('required')) {
+              <span class="text-danger">Please enter hours.</span>
+              }
+            </div>
+          </div>
+        </div>
+        }
+
+        <h4 class="my-3 text-center">
+          Total of subject hours must be equal:
+          <span class="btn btn-info mx-2">{{ totalHours }}</span>,
+          Current Total: {{ totalEnteredHours }}
+        </h4>
+
+        <div class="d-flex justify-content-center">
+          <button class="btn btn-primary" [disabled]="totalHours !== totalEnteredHours" (click)="generateTable()">
+            Generate Time Table
+          </button>
+        </div>
+      </div>
+    </form>
+    <h5></h5>
+  </div>
+  }
+
+  @if(timeTableArray.length>0){
+  <table class="table table-hover table-bordered">
+    <tbody>
+      @for(row of timeTableArray; track row){
+      <tr>
+        @for(subject of row; track subject){
+        <td class="text-center">{{ subject }}</td>
+        }
+      </tr>
+      }
+    </tbody>
+  </table>
+  }
+</div>
